@@ -1,3 +1,8 @@
+CREATE TABLE authors (
+  id   int PRIMARY KEY,
+  name text      NOT NULL,
+  bio  text
+); --WHY IS IT NOT CREATING authors as a table??
 -- name: GetAuthor :one
 SELECT * FROM authors
 WHERE id = $1 LIMIT 1;

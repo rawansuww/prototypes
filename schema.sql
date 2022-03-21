@@ -1,5 +1,5 @@
 CREATE TABLE authors (
-  id   BIGSERIAL PRIMARY KEY,
+  id   int PRIMARY KEY,
   name text      NOT NULL,
   bio  text
-);
+); --WHY IS IT NOT CREATING authors as a table??
