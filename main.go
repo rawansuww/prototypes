@@ -22,7 +22,7 @@ CREATE TABLE person (
     email text
 );`
 
-func main() {
+func main() { //adjust user and db name!
 	db, err := sqlx.Connect("postgres", "user=postgres dbname=sqlxdb sslmode=disable")
 	if err != nil {
 		log.Fatalln(err)
@@ -32,7 +32,7 @@ func main() {
 	// database drivers;  pq will exec them all, sqlite3 won't, ymmv
 	db.MustExec(schema)
 
-	tx := db.MustBegin()
+	tx := db.MustBegin() //insert statements
 	tx.MustExec("INSERT INTO person (first_name, last_name, email) VALUES ($1, $2, $3)", "Jason", "Moiron", "jmoiron@jmoiron.net")
 	tx.MustExec("INSERT INTO person (first_name, last_name, email) VALUES ($1, $2, $3)", "John", "Doe", "johndoeDNE@gmail.net")
 	tx.MustExec("INSERT INTO person (first_name, last_name, email) VALUES ($1, $2, $3)", "Noora", "Hussein", "noora@hotmail.com")
@@ -47,13 +47,7 @@ func main() {
 	db.Select(&people, "SELECT * FROM person ORDER BY first_name ASC")
 	jason, john := people[0], people[1]
 
-	fmt.Printf("%#v\n%#v", jason, john)
-
-	// You can also get a single result, a la QueryRow
-	jason = Person{}
-	err = db.Get(&jason, "SELECT * FROM person WHERE first_name=$1", "Jason")
-	fmt.Printf("%#v\n", jason)
-	// Person{FirstName:"Jason", LastName:"Moiron", Email:"jmoiron@jmoiron.net"}
+	fmt.Printf("%#v\n%#v\n", jason, john)
 
 	// if you have null fields and use SELECT *, you must use sql.Null* in your struct
 	morePeople := []Person{}
