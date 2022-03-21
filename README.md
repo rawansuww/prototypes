@@ -1,6 +1,5 @@
-This is the sqlx prototype
 
-sqlx is an extension toolkit library built on database/sql, where you have to write SQL queries to interact with your database
+sqlx is an extension toolkit library built on database/sql, where you have to write SQL queries to interact with your database, just meant to make it easier to work with SQL databases than the standard database/sql library
 
 Basic Use:
 
