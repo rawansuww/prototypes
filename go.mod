@@ -1,4 +1,4 @@
-module sqlx
+module github.com/rawansuww/prototypes
 
 go 1.17
 

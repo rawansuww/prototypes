@@ -6,7 +6,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	_ "github.com/rawansuww/models"
+	_ "github.com/rawansuww/prototypes/models"
 )
 
 var schema = `
