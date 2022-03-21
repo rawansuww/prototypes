@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 
@@ -14,24 +13,14 @@ type Person struct {
 	LastName  string `db:"last_name"`
 	Email     string
 }
-type Place struct {
-	Country string
-	City    sql.NullString
-	TelCode int
-}
 
 var schema = `
+DROP TABLE IF EXISTS person;
 CREATE TABLE person (
     first_name text,
     last_name text,
     email text
-);
-
-CREATE TABLE place (
-    country text,
-    city text NULL,
-    telcode integer
-)`
+);`
 
 func main() {
 	db, err := sqlx.Connect("postgres", "user=postgres dbname=sqlxdb sslmode=disable")
@@ -46,56 +35,46 @@ func main() {
 	tx := db.MustBegin()
 	tx.MustExec("INSERT INTO person (first_name, last_name, email) VALUES ($1, $2, $3)", "Jason", "Moiron", "jmoiron@jmoiron.net")
 	tx.MustExec("INSERT INTO person (first_name, last_name, email) VALUES ($1, $2, $3)", "John", "Doe", "johndoeDNE@gmail.net")
-	tx.MustExec("INSERT INTO place (country, city, telcode) VALUES ($1, $2, $3)", "United States", "New York", "1")
-	tx.MustExec("INSERT INTO place (country, telcode) VALUES ($1, $2)", "Hong Kong", "852")
-	tx.MustExec("INSERT INTO place (country, telcode) VALUES ($1, $2)", "Singapore", "65")
+	tx.MustExec("INSERT INTO person (first_name, last_name, email) VALUES ($1, $2, $3)", "Noora", "Hussein", "noora@hotmail.com")
+	tx.MustExec("INSERT INTO person (first_name, last_name, email) VALUES ($1, $2, $3)", "Dianna", "Spencer", "queen@hotmail.com")
+	tx.MustExec("INSERT INTO person (first_name, last_name, email) VALUES ($1, $2, $3)", "Monicca", "Bellucci", "jesus@hotmail.com")
 	// Named queries can use structs, so if you have an existing struct (i.e. person := &Person{}) that you have populated, you can pass it in as &person
-	tx.NamedExec("INSERT INTO person (first_name, last_name, email) VALUES (:first_name, :last_name, :email)", &models.Person{"Jane", "Citizen", "jane.citzen@example.com"})
+	tx.NamedExec("INSERT INTO person (first_name, last_name, email) VALUES (:first_name, :last_name, :email)", &Person{"Jane", "Citizen", "jane.citzen@example.com"})
 	tx.Commit()
 
 	// Query the database, storing results in a []Person (wrapped in []interface{})
-	people := []models.Person{}
+	people := []Person{}
 	db.Select(&people, "SELECT * FROM person ORDER BY first_name ASC")
 	jason, john := people[0], people[1]
 
 	fmt.Printf("%#v\n%#v", jason, john)
-	// Person{FirstName:"Jason", LastName:"Moiron", Email:"jmoiron@jmoiron.net"}
-	// Person{FirstName:"John", LastName:"Doe", Email:"johndoeDNE@gmail.net"}
 
 	// You can also get a single result, a la QueryRow
-	jason = models.Person{}
+	jason = Person{}
 	err = db.Get(&jason, "SELECT * FROM person WHERE first_name=$1", "Jason")
 	fmt.Printf("%#v\n", jason)
 	// Person{FirstName:"Jason", LastName:"Moiron", Email:"jmoiron@jmoiron.net"}
 
 	// if you have null fields and use SELECT *, you must use sql.Null* in your struct
-	places := []models.Place{}
-	err = db.Select(&places, "SELECT * FROM place ORDER BY telcode ASC")
+	morePeople := []Person{}
+	err = db.Select(&morePeople, "SELECT * FROM person ORDER BY email ASC")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	usa, singsing, honkers := places[0], places[1], places[2]
+	peep1, peep2, peep3 := morePeople[0], morePeople[1], morePeople[2]
 
-	fmt.Printf("%#v\n%#v\n%#v\n", usa, singsing, honkers)
-	// Place{Country:"United States", City:sql.NullString{String:"New York", Valid:true}, TelCode:1}
-	// Place{Country:"Singapore", City:sql.NullString{String:"", Valid:false}, TelCode:65}
-	// Place{Country:"Hong Kong", City:sql.NullString{String:"", Valid:false}, TelCode:852}
-
+	fmt.Printf("%#v\n%#v\n%#v\n", peep1, peep2, peep3)
 	// Loop through rows using only one struct
-	place := models.Place{}
-	rows, err := db.Queryx("SELECT * FROM place")
+	pop := Person{}
+	rows, err := db.Queryx("SELECT * FROM person")
 	for rows.Next() {
-		err := rows.StructScan(&place)
+		err := rows.StructScan(&pop)
 		if err != nil {
 			log.Fatalln(err)
 		}
-		fmt.Printf("%#v\n", place)
+		fmt.Printf("%#v\n", pop)
 	}
-	// Place{Country:"United States", City:sql.NullString{String:"New York", Valid:true}, TelCode:1}
-	// Place{Country:"Hong Kong", City:sql.NullString{String:"", Valid:false}, TelCode:852}
-	// Place{Country:"Singapore", City:sql.NullString{String:"", Valid:false}, TelCode:65}
-
 	// Named queries, using `:name` as the bindvar.  Automatic bindvar support
 	// which takes into account the dbtype based on the driverName on sqlx.Open/Connect
 	_, err = db.NamedExec(`INSERT INTO person (first_name,last_name,email) VALUES (:first,:last,:email)`,
@@ -116,7 +95,7 @@ func main() {
 	// batch insert
 
 	// batch insert with structs
-	personStructs := []models.Person{
+	personStructs := []Person{
 		{FirstName: "Ardie", LastName: "Savea", Email: "asavea@ab.co.nz"},
 		{FirstName: "Sonny Bill", LastName: "Williams", Email: "sbw@ab.co.nz"},
 		{FirstName: "Ngani", LastName: "Laumape", Email: "nlaumape@ab.co.nz"},
