@@ -1,12 +1,12 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	_ "github.com/rawansuww/models"
 )
 
 var schema = `
@@ -22,21 +22,7 @@ CREATE TABLE place (
     telcode integer
 )`
 
-type Person struct {
-	FirstName string `db:"first_name"`
-	LastName  string `db:"last_name"`
-	Email     string
-}
-
-type Place struct {
-	Country string
-	City    sql.NullString
-	TelCode int
-}
-
 func main() {
-	// this Pings the database trying to connect
-	// use sqlx.Open() for sql.Open() semantics
 	db, err := sqlx.Connect("postgres", "user=postgres dbname=sqlxdb sslmode=disable")
 	if err != nil {
 		log.Fatalln(err)
