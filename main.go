@@ -1,13 +1,24 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	_ "github.com/rawansuww/prototypes/models"
 )
+
+type Person struct {
+	FirstName string `db:"first_name"`
+	LastName  string `db:"last_name"`
+	Email     string
+}
+type Place struct {
+	Country string
+	City    sql.NullString
+	TelCode int
+}
 
 var schema = `
 CREATE TABLE person (
@@ -39,11 +50,11 @@ func main() {
 	tx.MustExec("INSERT INTO place (country, telcode) VALUES ($1, $2)", "Hong Kong", "852")
 	tx.MustExec("INSERT INTO place (country, telcode) VALUES ($1, $2)", "Singapore", "65")
 	// Named queries can use structs, so if you have an existing struct (i.e. person := &Person{}) that you have populated, you can pass it in as &person
-	tx.NamedExec("INSERT INTO person (first_name, last_name, email) VALUES (:first_name, :last_name, :email)", &Person{"Jane", "Citizen", "jane.citzen@example.com"})
+	tx.NamedExec("INSERT INTO person (first_name, last_name, email) VALUES (:first_name, :last_name, :email)", &models.Person{"Jane", "Citizen", "jane.citzen@example.com"})
 	tx.Commit()
 
 	// Query the database, storing results in a []Person (wrapped in []interface{})
-	people := []Person{}
+	people := []models.Person{}
 	db.Select(&people, "SELECT * FROM person ORDER BY first_name ASC")
 	jason, john := people[0], people[1]
 
@@ -52,13 +63,13 @@ func main() {
 	// Person{FirstName:"John", LastName:"Doe", Email:"johndoeDNE@gmail.net"}
 
 	// You can also get a single result, a la QueryRow
-	jason = Person{}
+	jason = models.Person{}
 	err = db.Get(&jason, "SELECT * FROM person WHERE first_name=$1", "Jason")
 	fmt.Printf("%#v\n", jason)
 	// Person{FirstName:"Jason", LastName:"Moiron", Email:"jmoiron@jmoiron.net"}
 
 	// if you have null fields and use SELECT *, you must use sql.Null* in your struct
-	places := []Place{}
+	places := []models.Place{}
 	err = db.Select(&places, "SELECT * FROM place ORDER BY telcode ASC")
 	if err != nil {
 		fmt.Println(err)
@@ -72,7 +83,7 @@ func main() {
 	// Place{Country:"Hong Kong", City:sql.NullString{String:"", Valid:false}, TelCode:852}
 
 	// Loop through rows using only one struct
-	place := Place{}
+	place := models.Place{}
 	rows, err := db.Queryx("SELECT * FROM place")
 	for rows.Next() {
 		err := rows.StructScan(&place)
@@ -105,7 +116,7 @@ func main() {
 	// batch insert
 
 	// batch insert with structs
-	personStructs := []Person{
+	personStructs := []models.Person{
 		{FirstName: "Ardie", LastName: "Savea", Email: "asavea@ab.co.nz"},
 		{FirstName: "Sonny Bill", LastName: "Williams", Email: "sbw@ab.co.nz"},
 		{FirstName: "Ngani", LastName: "Laumape", Email: "nlaumape@ab.co.nz"},
