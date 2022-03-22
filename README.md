@@ -8,6 +8,7 @@ Steps:
     
     The 'tutorial' package is purely generated code. The main.go file is where you can call and use the auto-generated functions. 
     
+    
 Problems:
 - the codegen actually did not create a postgres table, i had to do it manually each time, not sure if there was a generated 'create table' function at all
 - it was actually a pain to use
