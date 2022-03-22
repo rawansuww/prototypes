@@ -10,5 +10,5 @@ require (
 
 require (
 	xorm.io/builder v0.3.9 // indirect
-	xorm.io/xorm v1.2.5 // indirect
+	xorm.io/xorm v1.2.5
 )
