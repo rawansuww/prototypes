@@ -1,24 +1,20 @@
-CREATE TABLE authors (
-  id   int PRIMARY KEY,
-  name text      NOT NULL,
-  bio  text
-); --WHY IS IT NOT CREATING authors as a table??
--- name: GetAuthor :one
-SELECT * FROM authors
+
+-- name: GetPerson :one
+SELECT * FROM persons
 WHERE id = $1 LIMIT 1;
 
--- name: ListAuthors :many
-SELECT * FROM authors
-ORDER BY name;
+-- name: ListPersons :many
+SELECT * FROM persons
+ORDER BY Email;
 
--- name: CreateAuthor :one
-INSERT INTO authors (
-  name, bio
+-- name: CreatePerson :one
+INSERT INTO persons (
+  FirstName, LastName, Email
 ) VALUES (
-  $1, $2
+  $1, $2, $3
 )
 RETURNING *;
 
--- name: DeleteAuthor :exec
-DELETE FROM authors
+-- name: DeletePerson :exec
+DELETE FROM persons
 WHERE id = $1;

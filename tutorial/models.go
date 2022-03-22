@@ -6,8 +6,9 @@ import (
 	"database/sql"
 )
 
-type Author struct {
-	ID   int32
-	Name string
-	Bio  sql.NullString
+type Person struct {
+	ID        int32
+	Firstname sql.NullString
+	Lastname  sql.NullString
+	Email     sql.NullString
 }

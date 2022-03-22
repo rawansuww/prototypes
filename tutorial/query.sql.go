@@ -8,65 +8,80 @@ import (
 	"database/sql"
 )
 
-const createAuthor = `-- name: CreateAuthor :one
-INSERT INTO authors (
-  name, bio
+const createPerson = `-- name: CreatePerson :one
+INSERT INTO persons (
+  FirstName, LastName, Email
 ) VALUES (
-  $1, $2
+  $1, $2, $3
 )
-RETURNING id, name, bio
+RETURNING id, firstname, lastname, email
 `
 
-type CreateAuthorParams struct {
-	Name string
-	Bio  sql.NullString
+type CreatePersonParams struct {
+	Firstname sql.NullString
+	Lastname  sql.NullString
+	Email     sql.NullString
 }
 
-func (q *Queries) CreateAuthor(ctx context.Context, arg CreateAuthorParams) (Author, error) {
-	row := q.db.QueryRowContext(ctx, createAuthor, arg.Name, arg.Bio)
-	var i Author
-	err := row.Scan(&i.ID, &i.Name, &i.Bio)
+func (q *Queries) CreatePerson(ctx context.Context, arg CreatePersonParams) (Person, error) {
+	row := q.db.QueryRowContext(ctx, createPerson, arg.Firstname, arg.Lastname, arg.Email)
+	var i Person
+	err := row.Scan(
+		&i.ID,
+		&i.Firstname,
+		&i.Lastname,
+		&i.Email,
+	)
 	return i, err
 }
 
-const deleteAuthor = `-- name: DeleteAuthor :exec
-DELETE FROM authors
+const deletePerson = `-- name: DeletePerson :exec
+DELETE FROM persons
 WHERE id = $1
 `
 
-func (q *Queries) DeleteAuthor(ctx context.Context, id int32) error {
-	_, err := q.db.ExecContext(ctx, deleteAuthor, id)
+func (q *Queries) DeletePerson(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, deletePerson, id)
 	return err
 }
 
-const getAuthor = `-- name: GetAuthor :one
-SELECT id, name, bio FROM authors
+const getPerson = `-- name: GetPerson :one
+SELECT id, firstname, lastname, email FROM persons
 WHERE id = $1 LIMIT 1
 `
 
-//WHY IS IT NOT CREATING authors as a table??
-func (q *Queries) GetAuthor(ctx context.Context, id int32) (Author, error) {
-	row := q.db.QueryRowContext(ctx, getAuthor, id)
-	var i Author
-	err := row.Scan(&i.ID, &i.Name, &i.Bio)
+func (q *Queries) GetPerson(ctx context.Context, id int32) (Person, error) {
+	row := q.db.QueryRowContext(ctx, getPerson, id)
+	var i Person
+	err := row.Scan(
+		&i.ID,
+		&i.Firstname,
+		&i.Lastname,
+		&i.Email,
+	)
 	return i, err
 }
 
-const listAuthors = `-- name: ListAuthors :many
-SELECT id, name, bio FROM authors
-ORDER BY name
+const listPersons = `-- name: ListPersons :many
+SELECT id, firstname, lastname, email FROM persons
+ORDER BY Email
 `
 
-func (q *Queries) ListAuthors(ctx context.Context) ([]Author, error) {
-	rows, err := q.db.QueryContext(ctx, listAuthors)
+func (q *Queries) ListPersons(ctx context.Context) ([]Person, error) {
+	rows, err := q.db.QueryContext(ctx, listPersons)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Author
+	var items []Person
 	for rows.Next() {
-		var i Author
-		if err := rows.Scan(&i.ID, &i.Name, &i.Bio); err != nil {
+		var i Person
+		if err := rows.Scan(
+			&i.ID,
+			&i.Firstname,
+			&i.Lastname,
+			&i.Email,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

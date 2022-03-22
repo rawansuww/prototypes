@@ -13,38 +13,39 @@ import (
 func run() error {
 	ctx := context.Background()
 
-	db, err := sql.Open("postgres", "user=postgres dbname=sqlcdb2 sslmode=disable")
+	db, err := sql.Open("postgres", "user=postgres dbname=sqlcdb sslmode=disable")
 	if err != nil {
 		return err
 	}
 
 	queries := tutorial.New(db)
 
-	// list all authors
-	authors, err := queries.ListAuthors(ctx)
+	// list all Persons
+	Persons, err := queries.ListPersons(ctx)
 	if err != nil {
 		return err
 	}
-	log.Println(authors)
+	log.Println(Persons)
 
-	// create an author
-	insertedAuthor, err := queries.CreateAuthor(ctx, tutorial.CreateAuthorParams{
-		Name: "Brian Kernighan",
-		Bio:  sql.NullString{String: "Co-author of The C Programming Language and The Go Programming Language", Valid: true},
+	// create an Person
+	insertedPerson, err := queries.CreatePerson(ctx, tutorial.CreatePersonParams{
+		Firstname: sql.NullString{String: "Brian", Valid: true},
+		Lastname:  sql.NullString{String: "Kheeston", Valid: true},
+		Email:     sql.NullString{String: "brian@golang.com", Valid: true},
 	})
 	if err != nil {
 		return err
 	}
-	log.Println(insertedAuthor)
+	log.Println(insertedPerson)
 
-	// get the author we just inserted
-	fetchedAuthor, err := queries.GetAuthor(ctx, insertedAuthor.ID)
+	// get the Person we just inserted
+	fetchedPerson, err := queries.GetPerson(ctx, insertedPerson.ID)
 	if err != nil {
 		return err
 	}
 
 	// prints true
-	log.Println(reflect.DeepEqual(insertedAuthor, fetchedAuthor))
+	log.Println(reflect.DeepEqual(insertedPerson, fetchedPerson))
 	return nil
 }
 
