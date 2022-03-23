@@ -1,12 +1,12 @@
-    sqlc is a SQL-to-Go code generator
+sqlc is a SQL-to-Go code generator
 
-Steps:
-- Installed sqlc with 'brew install sqlc' (can also install with go)
-- Added a sqlc.yaml, schema.sql and query.sql to define a basic schema and some desired queries
-- Ran the command 'sqlc generate' which produced three files under the 'tutorial' package
+Steps/Commands:
+- 'brew install sqlc' to install sqlc (can also install with go)
+- Added a sqlc.yaml, schema.sql and query.sql to define a basic schema and some desired SQL queries
+- 'sqlc generate' to generate the code which produced three files under the 'tutorial' package
     
     
-    The 'tutorial' package is purely generated code. The main.go file is where you can call and use the auto-generated functions. 
+    The 'tutorial' package is generated code. The main.go file is where you can call and use the auto-generated functions. 
     
     
 Problems:
